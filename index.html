@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Valentine Proposal</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      overflow: hidden; /* Prevent scrollbars during animations */
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 30px;
+      animation: fadeIn 2s ease-in-out;
+    }
+
+    .gif-container {
+      margin-bottom: 40px;
+    }
+
+    .gif-container img {
+      width: 250px;
+      height: auto;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 30px;
+      justify-content: center;
+    }
+
+    button {
+      padding: 15px 30px;
+      font-size: 1.2rem;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      font-weight: bold;
+      letter-spacing: 1px;
+      animation: bounce 2s ease-in-out infinite;
+      box-shadow: 0 6px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    #yes-button {
+      background-color: #ff6f61;
+      color: white;
+    }
+
+    #no-button {
+      background-color: #a6a6a6;
+      color: white;
+    }
+
+    #no-button:hover {
+      animation: shake 0.5s ease-in-out infinite;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .message {
+      margin-top: 40px;
+      font-size: 2rem;
+      color: #ff6f61;
+      opacity: 0;
+      animation: revealMessage 2s ease-in-out forwards;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-20px);
+      }
+    }
+
+    @keyframes bounce {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.1);
+      }
+    }
+
+    @keyframes shake {
+      0%, 100% {
+        transform: translateX(0);
+      }
+      25% {
+        transform: translateX(-10px);
+      }
+      75% {
+        transform: translateX(10px);
+      }
+    }
+
+    @keyframes revealMessage {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Heart Canvas */
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: -1;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <div>
+    <h1>Will You Be My Valentine?</h1>
+    <div class="gif-container">
+      <!-- Initial GIF -->
+      <img id="initial-gif" src="https://media.giphy.com/media/tpVKvAabWt3G5csMkT/giphy.gif" alt="Cute Frog GIF">
+      <!-- Second GIF (hidden initially) -->
+      <img id="second-gif" class="hidden" src="https://media.giphy.com/media/9Mv6b3qFrjimE5A2EP/giphy.gif" alt="Happy Frog GIF">
+    </div>
+    <div class="buttons">
+      <button id="yes-button">Yes</button>
+      <button id="no-button">No</button>
+    </div>
+    <div id="message" class="message hidden">I Love You! ❤️</div>
+  </div>
+
+  <!-- Heart Canvas -->
+  <canvas id="heart-canvas"></canvas>
+
+  <script>
+    const noButton = document.getElementById('no-button');
+    const yesButton = document.getElementById('yes-button');
+    const message = document.getElementById('message');
+    const initialGif = document.getElementById('initial-gif');
+    const secondGif = document.getElementById('second-gif');
+
+    // Sound Effect
+    const audio = new Audio('https://www.soundjay.com/button/beep-07.wav');
+
+    yesButton.addEventListener('click', () => {
+      // Hide initial GIF and show second GIF
+      initialGif.classList.add('hidden');
+      secondGif.classList.remove('hidden');
+
+      // Show the message
+      message.classList.remove('hidden');
+
+      // Hide buttons
+      noButton.style.display = 'none';
+      yesButton.style.display = 'none';
+
+      // Play sound effect
+      audio.play();
+
+      // Start falling hearts
+      startHearts();
+    });
+
+    noButton.addEventListener('mouseover', () => {
+      const randomX = Math.random() * (window.innerWidth - noButton.offsetWidth);
+      const randomY = Math.random() * (window.innerHeight - noButton.offsetHeight);
+      noButton.style.position = 'absolute';
+      noButton.style.left = `${randomX}px`;
+      noButton.style.top = `${randomY}px`;
+    });
+
+    // Heart Animation Logic
+    const canvas = document.getElementById('heart-canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const hearts = [];
+    const colors = ['#FF6F61', '#FFD700', '#87CEEB', '#FF69B4', '#98FB98'];
+
+    function createHeart() {
+      const x = Math.random() * canvas.width;
+      const y = -50; // Start above the screen
+      const size = Math.random() * 15 + 10;
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      const velocity = {
+        x: (Math.random() - 0.5) * 3,
+        y: Math.random() * 2 + 1
+      };
+      hearts.push({ x, y, size, color, velocity });
+    }
+
+    function drawHeart(x, y, size, color) {
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.bezierCurveTo(
+        x - size / 2, y - size / 2,
+        x - size, y + size / 3,
+        x, y + size
+      );
+      ctx.bezierCurveTo(
+        x + size, y + size / 3,
+        x + size / 2, y - size / 2,
+        x, y
+      );
+      ctx.closePath();
+      ctx.fillStyle = color;
+      ctx.fill();
+    }
+
+    function updateHearts() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      hearts.forEach((heart, index) => {
+        heart.x += heart.velocity.x;
+        heart.y += heart.velocity.y;
+
+        if (heart.y > canvas.height || heart.x < 0 || heart.x > canvas.width) {
+          hearts.splice(index, 1);
+        }
+
+        drawHeart(heart.x, heart.y, heart.size, heart.color);
+      });
+    }
+
+    function startHearts() {
+      setInterval(createHeart, 100); // Create a new heart every 100ms
+      setInterval(updateHearts, 1000 / 60); // Update hearts at 60 FPS
+    }
+  </script>
+</body>
+</html>

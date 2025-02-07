@@ -4,7 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Valentine Proposal</title>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@400;700&display=swap" rel="stylesheet">
   <style>
+    /* General Styles */
     body {
       margin: 0;
       padding: 0;
@@ -13,7 +16,7 @@
       align-items: center;
       height: 100vh;
       background-color: white;
-      font-family: Arial, sans-serif;
+      font-family: 'Quicksand', sans-serif;
       text-align: center;
       overflow: hidden; /* Prevent scrollbars during animations */
     }
@@ -21,11 +24,15 @@
     h1 {
       font-size: 2.5rem;
       margin-bottom: 30px;
-      animation: fadeIn 2s ease-in-out;
+      font-family: 'Pacifico', cursive;
+      opacity: 0; /* Start invisible */
+      animation: fadeIn 2s ease-in-out forwards; /* Fade in */
     }
 
     .gif-container {
       margin-bottom: 40px;
+      opacity: 0; /* Start invisible */
+      animation: fadeIn 2s ease-in-out forwards; /* Fade in */
     }
 
     .gif-container img {
@@ -73,19 +80,25 @@
 
     .message {
       margin-top: 40px;
-      font-size: 2rem;
+      font-size: 1.5rem;
       color: #ff6f61;
       opacity: 0;
       animation: revealMessage 2s ease-in-out forwards;
+      line-height: 1.6;
+      font-family: 'Pacifico', cursive;
+      max-width: 80%; /* Limit width for better wrapping */
+      margin: 0 auto; /* Center the message */
     }
 
     /* Animations */
     @keyframes fadeIn {
       from {
         opacity: 0;
+        transform: translateY(-20px); /* Start slightly above */
       }
       to {
         opacity: 1;
+        transform: translateY(0); /* End at original position */
       }
     }
 
@@ -138,6 +151,46 @@
       z-index: -1;
       pointer-events: none;
     }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 2rem;
+      }
+
+      .gif-container img {
+        width: 200px;
+      }
+
+      button {
+        padding: 10px 20px;
+        font-size: 1rem;
+      }
+
+      .message {
+        font-size: 1.2rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      .gif-container img {
+        width: 150px;
+      }
+
+      button {
+        padding: 8px 16px;
+        font-size: 0.9rem;
+      }
+
+      .message {
+        font-size: 1rem;
+        max-width: 90%; /* Wider text area for small screens */
+      }
+    }
   </style>
 </head>
 <body>
@@ -153,7 +206,10 @@
       <button id="yes-button">Yes</button>
       <button id="no-button">No</button>
     </div>
-    <div id="message" class="message hidden">I Love You! ❤️ I still can’t believe how lucky I am to have you in my life. You make every day brighter, and I’m so grateful for your love, your smile, and your heart.</div>
+    <div id="message" class="message hidden">
+      I Love You! ❤️<br>
+       I still can’t believe how lucky I am to have you in my life.<br> You make every day brighter,<br> and I’m so grateful for your love,<br> your smile, and your heart.
+    </div>
   </div>
 
   <!-- Heart Canvas -->
@@ -240,11 +296,9 @@
       hearts.forEach((heart, index) => {
         heart.x += heart.velocity.x;
         heart.y += heart.velocity.y;
-
         if (heart.y > canvas.height || heart.x < 0 || heart.x > canvas.width) {
           hearts.splice(index, 1);
         }
-
         drawHeart(heart.x, heart.y, heart.size, heart.color);
       });
     }

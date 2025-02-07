@@ -41,6 +41,7 @@
       display: flex;
       gap: 30px;
       justify-content: center;
+      margin-bottom: 60px; /* Add space below buttons */
     }
     button {
       padding: 15px 30px;
@@ -57,6 +58,7 @@
     #yes-button {
       background-color: #ff6f61;
       color: white;
+      transition: padding 0.3s ease, font-size 0.3s ease; /* Smooth growth */
     }
     #no-button {
       background-color: #a6a6a6;
@@ -70,7 +72,7 @@
       display: none;
     }
     .message {
-      margin-top: 40px;
+      margin-top: 60px; /* Increase space above messages */
       font-size: 1.5rem;
       color: #ff6f61;
       opacity: 0;
@@ -177,7 +179,7 @@
       <!-- Initial GIF -->
       <img id="initial-gif" src="https://media.giphy.com/media/tpVKvAabWt3G5csMkT/giphy.gif" alt="Cute Frog GIF">
       <!-- Second GIF (hidden initially) -->
-      <img id="second-gif" class="hidden" src="https://media.giphy.com/media/9Mv6b3qFrjimE5A2EP/giphy.gif" alt="Happy Frog GIF">
+      <img id="second-gif" class="hidden" src="" alt="Happy Frog GIF">
     </div>
     <div class="buttons">
       <button id="yes-button">Yes</button>
@@ -210,14 +212,22 @@
     yesButton.addEventListener('click', () => {
       // Hide initial GIF and show second GIF
       initialGif.classList.add('hidden');
+      secondGif.src = "https://media.giphy.com/media/9Mv6b3qFrjimE5A2EP/giphy.gif"; // Happy GIF
       secondGif.classList.remove('hidden');
-      // Show the message
+
+      // Show the love message
       message.classList.remove('hidden');
+
       // Hide buttons
       noButton.style.display = 'none';
       yesButton.style.display = 'none';
+
+      // Hide the game-over message (if it was shown)
+      gameOverMessage.classList.add('hidden');
+
       // Play sound effect
       audio.play();
+
       // Start falling hearts
       startHearts();
     });
@@ -249,13 +259,21 @@
     noButton.addEventListener('click', () => {
       noClickCount++;
 
-      // Make the "Yes" button bigger with each click
-      yesButton.style.transform = `scale(${1 + (noClickCount * 0.2)})`;
+      // Increase the size of the "Yes" button
+      const scaleFactor = 1 + (noClickCount * 0.2); // Scale factor for growth
+      yesButton.style.padding = `${15 * scaleFactor}px ${30 * scaleFactor}px`; // Increase padding
+      yesButton.style.fontSize = `${1.2 * scaleFactor}rem`; // Increase font size
 
       if (noClickCount >= 5) {
         // Game over: Hide buttons and show game-over message
         noButton.style.display = 'none';
         gameOverMessage.classList.remove('hidden');
+
+        // Instantly swap the GIF
+        initialGif.classList.add('hidden'); // Hide the initial GIF
+        secondGif.src = "https://media.giphy.com/media/G2s8Zp3xwTDlpobZdu/giphy.gif"; // Set the new GIF
+        secondGif.classList.remove('hidden'); // Show the new GIF
+
         return;
       }
 

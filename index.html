@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Valentine Proposal</title>
+  <title>Valentine Proposal Game</title>
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@400;700&display=swap" rel="stylesheet">
   <style>
@@ -20,7 +20,6 @@
       text-align: center;
       overflow: hidden; /* Prevent scrollbars during animations */
     }
-
     h1 {
       font-size: 2.5rem;
       margin-bottom: 30px;
@@ -28,56 +27,48 @@
       opacity: 0; /* Start invisible */
       animation: fadeIn 2s ease-in-out forwards; /* Fade in */
     }
-
     .gif-container {
       margin-bottom: 40px;
       opacity: 0; /* Start invisible */
       animation: fadeIn 2s ease-in-out forwards; /* Fade in */
     }
-
     .gif-container img {
       width: 250px;
       height: auto;
       animation: float 3s ease-in-out infinite;
     }
-
     .buttons {
       display: flex;
       gap: 30px;
       justify-content: center;
     }
-
     button {
       padding: 15px 30px;
       font-size: 1.2rem;
       border: none;
       border-radius: 30px;
       cursor: pointer;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth scaling */
       font-weight: bold;
       letter-spacing: 1px;
       animation: bounce 2s ease-in-out infinite;
       box-shadow: 0 6px 10px rgba(0, 0, 0, 0.1);
     }
-
     #yes-button {
       background-color: #ff6f61;
       color: white;
     }
-
     #no-button {
       background-color: #a6a6a6;
       color: white;
+      transition: left 0.3s ease, top 0.3s ease; /* Smooth movement */
     }
-
     #no-button:hover {
       animation: shake 0.5s ease-in-out infinite;
     }
-
     .hidden {
       display: none;
     }
-
     .message {
       margin-top: 40px;
       font-size: 1.5rem;
@@ -89,7 +80,6 @@
       max-width: 80%; /* Limit width for better wrapping */
       margin: 0 auto; /* Center the message */
     }
-
     /* Animations */
     @keyframes fadeIn {
       from {
@@ -101,7 +91,6 @@
         transform: translateY(0); /* End at original position */
       }
     }
-
     @keyframes float {
       0%, 100% {
         transform: translateY(0);
@@ -110,7 +99,6 @@
         transform: translateY(-20px);
       }
     }
-
     @keyframes bounce {
       0%, 100% {
         transform: scale(1);
@@ -119,7 +107,6 @@
         transform: scale(1.1);
       }
     }
-
     @keyframes shake {
       0%, 100% {
         transform: translateX(0);
@@ -131,7 +118,6 @@
         transform: translateX(10px);
       }
     }
-
     @keyframes revealMessage {
       from {
         opacity: 0;
@@ -142,7 +128,6 @@
         transform: translateY(0);
       }
     }
-
     /* Heart Canvas */
     canvas {
       position: fixed;
@@ -151,41 +136,33 @@
       z-index: -1;
       pointer-events: none;
     }
-
     /* Responsive Design */
     @media (max-width: 768px) {
       h1 {
         font-size: 2rem;
       }
-
       .gif-container img {
         width: 200px;
       }
-
       button {
         padding: 10px 20px;
         font-size: 1rem;
       }
-
       .message {
         font-size: 1.2rem;
       }
     }
-
     @media (max-width: 480px) {
       h1 {
         font-size: 1.5rem;
       }
-
       .gif-container img {
         width: 150px;
       }
-
       button {
         padding: 8px 16px;
         font-size: 0.9rem;
       }
-
       .message {
         font-size: 1rem;
         max-width: 90%; /* Wider text area for small screens */
@@ -210,46 +187,82 @@
       I Love You! ❤️<br>
        I still can’t believe how lucky I am to have you in my life. <br>You make every day brighter, and I’m so grateful for your love, your smile, and your heart.
     </div>
+    <div id="game-over-message" class="message hidden">
+      You can't escape love! ❤️<br>
+      Just say yes already!
+    </div>
   </div>
-
   <!-- Heart Canvas -->
   <canvas id="heart-canvas"></canvas>
-
   <script>
     const noButton = document.getElementById('no-button');
     const yesButton = document.getElementById('yes-button');
     const message = document.getElementById('message');
+    const gameOverMessage = document.getElementById('game-over-message');
     const initialGif = document.getElementById('initial-gif');
     const secondGif = document.getElementById('second-gif');
 
     // Sound Effect
     const audio = new Audio('https://www.soundjay.com/button/beep-07.wav');
 
+    let noClickCount = 0;
+
     yesButton.addEventListener('click', () => {
       // Hide initial GIF and show second GIF
       initialGif.classList.add('hidden');
       secondGif.classList.remove('hidden');
-
       // Show the message
       message.classList.remove('hidden');
-
       // Hide buttons
       noButton.style.display = 'none';
       yesButton.style.display = 'none';
-
       // Play sound effect
       audio.play();
-
       // Start falling hearts
       startHearts();
     });
 
     noButton.addEventListener('mouseover', () => {
-      const randomX = Math.random() * (window.innerWidth - noButton.offsetWidth);
-      const randomY = Math.random() * (window.innerHeight - noButton.offsetHeight);
+      if (noClickCount >= 5) return; // Stop moving after 5 clicks
+
+      // Generate random position within visible bounds
+      const randomX = Math.random() * (window.innerWidth - noButton.offsetWidth * 2);
+      const randomY = Math.random() * (window.innerHeight - noButton.offsetHeight * 2);
+
+      // Ensure the button doesn't overlap with the "Yes" button
+      const yesButtonRect = yesButton.getBoundingClientRect();
+      if (
+        randomX < yesButtonRect.right + 50 &&
+        randomX + noButton.offsetWidth > yesButtonRect.left - 50 &&
+        randomY < yesButtonRect.bottom + 50 &&
+        randomY + noButton.offsetHeight > yesButtonRect.top - 50
+      ) {
+        return; // Skip this position if it overlaps with "Yes"
+      }
+
+      // Apply the new position
       noButton.style.position = 'absolute';
       noButton.style.left = `${randomX}px`;
       noButton.style.top = `${randomY}px`;
+    });
+
+    noButton.addEventListener('click', () => {
+      noClickCount++;
+
+      // Make the "Yes" button bigger with each click
+      yesButton.style.transform = `scale(${1 + (noClickCount * 0.2)})`;
+
+      if (noClickCount >= 5) {
+        // Game over: Hide buttons and show game-over message
+        noButton.style.display = 'none';
+        gameOverMessage.classList.remove('hidden');
+        return;
+      }
+
+      // Shrink the "No" button after 2 clicks
+      if (noClickCount >= 2) {
+        noButton.style.transform = `scale(${1 - (noClickCount * 0.1)})`;
+      }
     });
 
     // Heart Animation Logic
@@ -257,7 +270,6 @@
     const ctx = canvas.getContext('2d');
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-
     const hearts = [];
     const colors = ['#FF6F61', '#FFD700', '#87CEEB', '#FF69B4', '#98FB98'];
 
